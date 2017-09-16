@@ -1,0 +1,32 @@
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\bin\Debug\WebCompare.exe.config
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\bin\Debug\WebCompare.exe
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\bin\Debug\WebCompare.pdb
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare.csprojResolveAssemblyReference.cache
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\App.g.cs
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare_MarkupCompile.cache
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare_MarkupCompile.lref
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\View\Resources.baml
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare.g.resources
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare.Properties.Resources.resources
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare.csproj.GenerateResource.Cache
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare.exe
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\WebCompare.pdb
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\View\MainWindow.g.cs
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\App.baml
+C:\Users\Service Tech\Documents\Test Programs\WebCompare\WebCompare\obj\Debug\View\MainWindow.baml
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\bin\Debug\WebCompare.exe.config
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare.exe
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare.pdb
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\bin\Debug\WebCompare.exe
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\bin\Debug\WebCompare.pdb
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare.csprojResolveAssemblyReference.cache
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\View\Resources.baml
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\View\MainWindow.g.cs
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\App.g.cs
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare_MarkupCompile.cache
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare_MarkupCompile.lref
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\App.baml
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\View\MainWindow.baml
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare.g.resources
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare.Properties.Resources.resources
+C:\Users\richa\OneDrive\School\CSC365\WebCompare\WebCompare\obj\Debug\WebCompare.csproj.GenerateResource.Cache
