@@ -19,7 +19,7 @@ namespace WebCompare
       private void AppStartup(object sender, StartupEventArgs e)
       {
          MainWindow mw = new MainWindow();
-         mw.DataContext = ViewModel.Session.Instance;
+         mw.DataContext = ViewModel.WebCompareViewModel.Instance;
          mw.Show();
       }
 

@@ -25,7 +25,7 @@ namespace WebCompare.Commands
          _canExecute = canExecute;
       }
 
-      public bool CanExecute(object parameter)
+        public bool CanExecute(object parameter)
       {
          if (_canExecute == null)
          {

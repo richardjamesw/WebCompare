@@ -67,6 +67,7 @@
     <Compile Include="Model\HTable.cs" />
     <Compile Include="Model\WebCompareModel.cs" />
     <Compile Include="ViewModel\Session.cs" />
+    <Compile Include="ViewModel\WebCompareViewModel.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
