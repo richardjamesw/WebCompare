@@ -52,7 +52,7 @@ namespace WebCompare.ViewModel
         #region Properties
 
         // user entereed url
-        private string userURL;
+        private string userURL = "https://stocktwits.com/symbol/GOOG";
         public string UserURL
         {
             get
