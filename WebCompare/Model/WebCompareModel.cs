@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -61,7 +62,7 @@ namespace WebCompare.Model
             return null;
         }
 
-        /*public static string GetWebData2(string url)
+/*        public static string GetWebData2(string url)
         {
             try
             {
@@ -105,9 +106,9 @@ namespace WebCompare.Model
             {
                 string temp = "";
 
-                string regex = @"(body&quot;:&quot;).*(&quot;,&quot;links)";
+                //string regex = @"(body&quot;:&quot;).*(&quot;,&quot;links)";
                 //string regexWiki = @"<p>\w+</p>";
-                string regexStock = "(?<=(body&quot;:&quot;)).*(?=(&quot;,&quot;links))";
+                //string regexStock = "(?<=(body&quot;:&quot;)).*(?=(&quot;,&quot;links))";
                 string regexStock2 = @"(?<=(body&quot;:&quot;))(\w|\d|\n|[().,\-:;@#$%^&*\[\]'+–/\/®°⁰!?{}|`~]| )+?(?=(&quot;,&quot;links))";
                 //string regexStock3 = "(?<=(<ol class='stream-list.*&quot;body&quot;:&quot;))(\\w|\\d|\n|^quot|[().,\\-:;@#$%^&*\\[\\]'+–/\\/®°⁰!?{}|`~]| )+?(?=(&quot;,&quot;links))";
 
@@ -129,19 +130,33 @@ namespace WebCompare.Model
 
 
         // Similarity
-        public static double CosineSimilarity(double[] tableA, double[] tableB)
-        {
-            double dotProduct = 0.0, normA = 0.0, normB = 0.0;
+        public static ArrayList BuildVector(HTable a, HTable b)
+      {
+         /*
+          * 5x Pos/Neg
+          * 3x bull, bullish, bear, bearish
+          * 3x Price
+          * 3x exchange
+          * 2x .Contains('$')
+          * 
+          */
+         return null;
 
-            for (int i = 0; i < tableA.Length; i++)
-            {
-                dotProduct += tableA[i] * tableB[i];
-                normA += Math.Pow(tableA[i], 2);
-                normB += Math.Pow(tableB[i], 2);
-            }
-            return dotProduct / (Math.Sqrt(normA) * Math.Sqrt(normB));
-        }
+      }
 
+      public static double CosineSimilarity(double[] tableA, double[] tableB)
+      {
+         double dotProduct = 0.0, normA = 0.0, normB = 0.0;
+
+         for (int i = 0; i < tableA.Length; i++)
+         {
+            dotProduct += tableA[i] * tableB[i];
+            normA += Math.Pow(tableA[i], 2);
+            normB += Math.Pow(tableB[i], 2);
+         }
+         return dotProduct / (Math.Sqrt(normA) * Math.Sqrt(normB));
+
+      }
         #endregion
 
 

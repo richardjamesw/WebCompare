@@ -70,8 +70,9 @@ namespace WebCompare.ViewModel
                 return null;
             }
 
+            //string[] test = GetWebDataAgility(wcViewModel.UserURL);
+
             wcViewModel.DataDump = "";
-            NotifyPropertyChanged("DataDump");
             string[] data = null;
             string[] parsedData = null;
 
@@ -108,7 +109,7 @@ namespace WebCompare.ViewModel
                     wcViewModel.DataDump += "\nPARSING data from USER entered webpage";
                     parsedData = WebCompareModel.Parser(data);
 
-                    // Fill respective table
+                    // Fill respective 
                     wcViewModel.DataDump += "\nFILLING TABLE from USER entered webpage\n";
                     if (parsedData != null)
                     {
@@ -139,18 +140,42 @@ namespace WebCompare.ViewModel
         private static string[] GetWebDataAgility(string url)
         {
             string[] data = null;
+            
             try
             {
                 var webGet = new HtmlWeb();
                 var doc = webGet.Load(url);
+                string exch = "", price = "", chng = "";
 
+                // Class
+                var node = doc.DocumentNode.SelectSingleNode("//span[@class='exchange']");
+                if (node != null) exch = node.InnerText;
+                // Price
+                node = doc.DocumentNode.SelectSingleNode("//span[@class='price']");
+                if (node != null) price = node.InnerText;
+                // Change
+                chng = doc.DocumentNode.SelectSingleNode("//span[@class='change positive']").Attributes.FirstOrDefault().Value;
+                if (chng == "")
+                {
+                   chng = "negative";
+                }
+                else
+                {
+                   chng = "positive";
+                }
+                
+               
+                // Get messages
                 var nodes = doc.DocumentNode.SelectNodes("//*[@id=\"updates\"]//li");
-                data = new string[nodes.Count()];
-                int c = 0;
+                data = new string[nodes.Count() + 3];   // Add 3 for class, exchange and price
+                data[0] = exch;
+                data[1] = price;
+                data[2] = chng;
+                int i = 3;
                 foreach (var n in nodes)
                 {
-                    data[c] = n.GetAttributeValue("data-src", null);
-                    ++c;
+                    data[i] = n.GetAttributeValue("data-src", null);
+                    ++i;
                 }
 
             }
