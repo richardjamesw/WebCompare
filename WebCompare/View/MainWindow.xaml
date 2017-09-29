@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="0" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -49,13 +49,13 @@
                 </Button>
             </Border>
         </WrapPanel>
-        
+
 
         <!-- List of Websites -->
         <ListBox x:Name="lstWebsites" ItemsSource="{Binding ListWebsites}" Grid.Column="2" Grid.Row="1" Grid.RowSpan="4" HorizontalAlignment="Center" VerticalAlignment="Top" Height="400" Width="300" Margin="10" />
-        
+
         <!-- Website Data Received -->
-        <TextBox x:Name="txtDataRcv" Text="{Binding DataDump}" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="300" Margin="5" TextWrapping="Wrap" />
+        <TextBox x:Name="txtDataRcv" Text="{Binding DataDump, Mode=OneWay}" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,10,5" TextWrapping="Wrap" />
 
 
 

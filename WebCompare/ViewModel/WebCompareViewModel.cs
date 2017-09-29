@@ -9,7 +9,7 @@ using WebCompare.Model;
 
 namespace WebCompare.ViewModel
 {
-    class WebCompareViewModel : INotifyPropertyChanged
+    public class WebCompareViewModel : INotifyPropertyChanged
     {
         #region Instance Variables
         private WebCompareModel wcModel;
@@ -34,7 +34,6 @@ namespace WebCompare.ViewModel
 
         public WebCompareViewModel()
         {
-            wcModel = new WebCompareModel();
         }
         #endregion
 
@@ -52,7 +51,7 @@ namespace WebCompare.ViewModel
         #region Properties
 
         // user entereed url
-        private string userURL = "https://stocktwits.com/symbol/GOOG";
+        private string userURL = "https://stocktwits.com/symbol/QQQ";
         public string UserURL
         {
             get
@@ -70,11 +69,11 @@ namespace WebCompare.ViewModel
         {
             get
             {
-                return wcModel.Websites;
+                return WebCompareModel.Websites;
             }
         }
 
-        private string data_dump = "Enter a URL and press start above.";
+        private string data_dump = "Enter a URL and press start above. \n Or try https://stocktwits.com/symbol/GOOG.";
         public string DataDump
         {
             get
@@ -86,7 +85,7 @@ namespace WebCompare.ViewModel
             {
                 if (data_dump != value)
                 {
-                    data_dump += value;
+                    data_dump = value;
                     NotifyPropertyChanged("DataDump");
                 }
 

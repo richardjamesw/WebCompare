@@ -46,3 +46,7 @@ C:\Dev\WebCompare\WebCompare\obj\Debug\View\MainWindow.baml
 C:\Dev\WebCompare\WebCompare\obj\Debug\WebCompare.g.resources
 C:\Dev\WebCompare\WebCompare\obj\Debug\WebCompare.Properties.Resources.resources
 C:\Dev\WebCompare\WebCompare\obj\Debug\WebCompare.csproj.GenerateResource.Cache
+C:\Dev\WebCompare\WebCompare\bin\Debug\HtmlAgilityPack.dll
+C:\Dev\WebCompare\WebCompare\bin\Debug\HtmlAgilityPack.pdb
+C:\Dev\WebCompare\WebCompare\bin\Debug\HtmlAgilityPack.xml
+C:\Dev\WebCompare\WebCompare\obj\Debug\WebCompare_Content.g.cs
