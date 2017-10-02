@@ -34,7 +34,7 @@ namespace WebCompare.ViewModel
 
         public WebCompareViewModel()
         {
-           StartCommand = new DelegateCommand(OnStart, CanStart);
+            StartCommand = new DelegateCommand(OnStart, CanStart);
         }
         #endregion
 
@@ -113,34 +113,31 @@ namespace WebCompare.ViewModel
 
             }
         }
-
-        public void AddMessage(string s)
-        {
-            
-        }
-
         #endregion
 
         #region Commands
-        // Old method
-        // Button to call start method
-        //public ICommand BtnGo
-        //{
-        //    get
-        //    {
-        //        return new Commands.DelegateCommand(o => Session.Instance.Start());
-        //    }
-        //}
+
         public DelegateCommand StartCommand { get; private set; }
         private void OnStart()
-      {
-         Session.Instance.Start();
-      }
-      private bool CanStart()
-      {
-         return !Session.Instance.worker.IsBusy;
-      }
+        {
+            Session.Instance.Start();
+        }
+        private bool CanStart()
+        {
+            return Session.Instance.CanStart();
+        }
         #endregion
 
     }
 }
+
+
+// Old method
+// Button to call start method
+//public ICommand BtnGo
+//{
+//    get
+//    {
+//        return new Commands.DelegateCommand(o => Session.Instance.Start());
+//    }
+//}

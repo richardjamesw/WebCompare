@@ -29,68 +29,7 @@ namespace WebCompare.Model
             }
         }
 
-        public static string RandomWebsite
-        {
-            get
-            {
-                return "https://en.wikipedia.org/wiki/Special:Random";
-            }
-        }
-
         #region Helper Methods
-
-        /// <summary>
-        /// Get the data from a website as a string
-        /// </summary>
-        /// <param name="url">website to pull data from</param>
-        public static string GetWebData(string url)
-        {
-
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    string s = client.DownloadString(url);
-                    return s;
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Exception caught: " + e, "Exception:Session:GetWebData()", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-
-            return null;
-        }
-
-        /*        public static string GetWebData2(string url)
-                {
-                    try
-                    {
-                        string line = "";
-                        string parsed = "";
-                        WebRequest webRequest;
-                        webRequest = WebRequest.Create(url);
-
-                        Stream objStream;
-                        objStream = webRequest.GetResponse().GetResponseStream();
-
-                        StreamReader objReader = new StreamReader(objStream);
-
-                        while (objReader != null)
-                        {
-                            line = objReader.ReadLine();
-                            parsed += Parser(line) + "\n";
-                        }
-                        return parsed;
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show("Exception caught: " + e, "Exception:Session:GetWebData()", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-
-                    return null;
-                }*/
-
 
         /// <summary>
         /// Parse the data using regex and weighted delimiters
@@ -182,7 +121,68 @@ namespace WebCompare.Model
 
         }
         #endregion
-
-
     }
 }
+
+/* Methods No longer used - Now use HTML Agility Pack instead
+ * 
+//public static string RandomWebsite
+        //{
+        //    get
+        //    {
+        //        return "https://en.wikipedia.org/wiki/Special:Random";
+        //    }
+        //}
+
+/// <summary>
+/// Get the data from a website as a string
+/// </summary>
+/// <param name="url">website to pull data from</param>
+ public static string GetWebData(string url)
+{
+
+    try
+    {
+        using (WebClient client = new WebClient())
+        {
+            string s = client.DownloadString(url);
+            return s;
+        }
+    }
+    catch (Exception e)
+    {
+        MessageBox.Show("Exception caught: " + e, "Exception:Session:GetWebData()", MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
+    return null;
+}
+
+       public static string GetWebData2(string url)
+        {
+            try
+            {
+                string line = "";
+                string parsed = "";
+                WebRequest webRequest;
+                webRequest = WebRequest.Create(url);
+
+                Stream objStream;
+                objStream = webRequest.GetResponse().GetResponseStream();
+
+                StreamReader objReader = new StreamReader(objStream);
+
+                while (objReader != null)
+                {
+                    line = objReader.ReadLine();
+                    parsed += Parser(line) + "\n";
+                }
+                return parsed;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Exception caught: " + e, "Exception:Session:GetWebData()", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+            return null;
+        }*/
+
