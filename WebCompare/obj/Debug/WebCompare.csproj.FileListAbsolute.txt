@@ -50,3 +50,5 @@ C:\Dev\WebCompare\WebCompare\bin\Debug\HtmlAgilityPack.dll
 C:\Dev\WebCompare\WebCompare\bin\Debug\HtmlAgilityPack.pdb
 C:\Dev\WebCompare\WebCompare\bin\Debug\HtmlAgilityPack.xml
 C:\Dev\WebCompare\WebCompare\obj\Debug\WebCompare_Content.g.cs
+C:\Dev\WebCompare\WebCompare\bin\Debug\Prism.dll
+C:\Dev\WebCompare\WebCompare\bin\Debug\Prism.xml
