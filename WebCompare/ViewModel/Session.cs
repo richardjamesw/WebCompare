@@ -11,6 +11,7 @@ using WebCompare.Model;
 using System.Text.RegularExpressions;
 using System.IO;
 using HtmlAgilityPack;
+using System.Windows.Threading;
 
 namespace WebCompare.ViewModel
 {
@@ -40,10 +41,6 @@ namespace WebCompare.ViewModel
 
         public Session()
         {
-            for (int t = 0; t < tables.Length; ++t)
-            {
-                tables[t] = new HTable();
-            }
         }
         #endregion
 
@@ -63,18 +60,27 @@ namespace WebCompare.ViewModel
         /// <returns></returns>
         public Action<object> Start()
         {
+            // Setup table for user entered url
+            for (int t = 0; t < tables.Length; ++t)
+            {
+                tables[t] = new HTable();
+                if (t < WebCompareModel.Websites.Length)
+                    tables[t].URL = WebCompareModel.Websites[t];
+                else
+                    tables[t].URL = wcViewModel.UserURL;
+            }
+
             // if nothings entered in url return
             if (wcViewModel.UserURL == "")
             {
-                wcViewModel.DataDump += "\nPlease enter a valid URL";
+                AddMessage("\nPlease enter a valid URL");
                 return null;
             }
 
             //string[] test = GetWebDataAgility(wcViewModel.UserURL);
-
-            wcViewModel.DataDump = "";
+            AddMessage("");
             string[] data = null;
-            string[] parsedData = null;
+            string[] parsedMessages = null;
 
             // Get Data from Websites
             for (int w = 0; w <= WebCompareModel.Websites.Length; ++w)
@@ -82,51 +88,49 @@ namespace WebCompare.ViewModel
                 if (w != WebCompareModel.Websites.Length)
                 {
                     // Get data
-                    WebCompareViewModel.Instance.DataDump += "\nGETTING data from: " + WebCompareModel.Websites[w];
+                    AddMessage("\nGETTING data from: " + WebCompareModel.Websites[w]);
                     data = GetWebDataAgility(WebCompareModel.Websites[w]);
 
                     // Parse each message into
-                    wcViewModel.DataDump += "\nPARSING data from: " + WebCompareModel.Websites[w];
-                    parsedData = WebCompareModel.Parser(data);
+                    AddMessage("\nPARSING data from: " + WebCompareModel.Websites[w]);
+                    parsedMessages = WebCompareModel.Parser(data);
 
                     // Fill respective table
-                    wcViewModel.DataDump += "\nFILLING TABLE from: " + WebCompareModel.Websites[w] + "\n";
-                    if (parsedData != null)
-                    {
-                        foreach (string word in parsedData.Where(x => x != ""))
-                        {
-                            tables[w].Put(word, 1);
-                        }
-                    }
+                    AddMessage("\nFILLING TABLE from: " + WebCompareModel.Websites[w] + "\n");
+                    FillTables(data, parsedMessages, w);
+
                 }
                 else   // We are at the last table, aka the User entered table
                 {
                     // Get data
-                    wcViewModel.DataDump += "\nGETTING data from USER entered webpage";
+                    AddMessage("\nGETTING data from USER entered webpage");
                     data = GetWebDataAgility(wcViewModel.UserURL);
 
                     // Parse each message into
-                    wcViewModel.DataDump += "\nPARSING data from USER entered webpage";
-                    parsedData = WebCompareModel.Parser(data);
+                    AddMessage("\nPARSING data from USER entered webpage");
+                    parsedMessages = WebCompareModel.Parser(data);
 
-                    // Fill respective 
-                    wcViewModel.DataDump += "\nFILLING TABLE from USER entered webpage\n";
-                    if (parsedData != null)
-                    {
-                        foreach (string word in parsedData.Where(x => x != ""))
-                        {
-                            tables[w].Put(word, 1);
-                        }
-                    }
+                    // Fill respective
+                    AddMessage("\nFILLING TABLE from USER entered webpage\n");
+                    FillTables(data, parsedMessages, w);
                 }
-                
+
             }    // End get data from websites
 
             // Calculate cosine vectors
-            wcViewModel.DataDump += "\nCALCULATING cosine vectors\n";
-            // Compare to the entered URL by the user
+            AddMessage("\nCALCULATING cosine vectors\n");
 
-            // Display the results in order
+            for (int tab = 0; tab < tables.Length - 1; ++tab)
+            {
+                // get vector, last table is the user entered table
+                List<object>[] vector = WebCompareModel.BuildVector(tables[tab], tables[tables.Length - 1]);
+                // Calcualte similarity
+                tables[tab].Similarity = WebCompareModel.CosineSimilarity(vector);
+            }
+
+            // Compare to the entered URL by the user
+            //     and display results in order
+            wcViewModel.Results = GetResults();
 
             return null;
 
@@ -136,18 +140,26 @@ namespace WebCompare.ViewModel
 
         #region Helper Files
 
+        //Send message to GUI
+        private void AddMessage(string s)
+        {
+            if (s.Equals("")) wcViewModel.Status = "";
+            else wcViewModel.Status += s;
+            NotifyPropertyChanged("Status");
+        }
+
         // HTMPAglityPack Get
         private static string[] GetWebDataAgility(string url)
         {
             string[] data = null;
-            
+
             try
             {
                 var webGet = new HtmlWeb();
                 var doc = webGet.Load(url);
                 string exch = "", price = "", chng = "";
 
-                // Class
+                // Exchange
                 var node = doc.DocumentNode.SelectSingleNode("//span[@class='exchange']");
                 if (node != null) exch = node.InnerText;
                 // Price
@@ -157,14 +169,14 @@ namespace WebCompare.ViewModel
                 chng = doc.DocumentNode.SelectSingleNode("//span[@class='change positive']").Attributes.FirstOrDefault().Value;
                 if (chng == "")
                 {
-                   chng = "negative";
+                    chng = "negative";
                 }
                 else
                 {
-                   chng = "positive";
+                    chng = "positive";
                 }
-                
-               
+
+
                 // Get messages
                 var nodes = doc.DocumentNode.SelectNodes("//*[@id=\"updates\"]//li");
                 data = new string[nodes.Count() + 3];   // Add 3 for class, exchange and price
@@ -182,6 +194,87 @@ namespace WebCompare.ViewModel
             catch (Exception e) { Console.WriteLine("Error in GetWebDataAgility(): " + e); }
 
             return data;
+        }
+
+        // Put keywords into tables with Weighted values
+        private void FillTables(string[] metaData, string[] messages, int tableNum)
+        {
+            try
+            {
+                // parsedMessages doesn't contain meta data
+                // data[0] is Exchange
+                if (metaData[0] != "")
+                {
+                    tables[tableNum].Put(metaData[0], 5);
+                }
+                // data[1] is Price
+                double price = 0;
+                try { price = Convert.ToDouble(metaData[1]); } catch { }
+                if (0 < price && price <= 10)
+                {
+                    tables[tableNum].Put("CheapStock", 5);
+                }
+                else if (10 < price && price <= 100)
+                {
+                    tables[tableNum].Put("MediumStock", 5);
+                }
+                else if (100 < price && price <= 300)
+                {
+                    tables[tableNum].Put("MediumHighStock", 5);
+                }
+                else if (300 < price && price <= 700)
+                {
+                    tables[tableNum].Put("HighStock", 5);
+                }
+                else if (price > 700)
+                {
+                    tables[tableNum].Put("ExpensiveStock", 5);
+                }
+                // data[1] is Change neg/pos
+                tables[tableNum].Put(metaData[2], 7);
+
+                // Add words from messages to table
+                int val = 0;
+                if (messages != null)
+                {
+                    foreach (string word in messages.Where(x => x != ""))
+                    {
+                        if (word.Equals("bull") || word.Equals("bear") || word.Equals("bullish") || word.Equals("bearish"))
+                            val += 2;
+                        if (word.Contains("$"))
+                            val += 2;
+                        tables[tableNum].Put(word, val);
+                    }
+                }
+            }
+            catch (Exception e) { Console.WriteLine("Error in FillTable(): " + e); }
+        }
+
+        private string GetResults()
+        {
+            string results = "";
+            HTable temp;
+            try
+            {
+                // Sort similarities (bubble sort)
+                for (int index = 0; index < tables.Length - 1; ++index)
+                    for (int scan = index + 1; scan < tables.Length - 1; scan++)
+                        if (tables[index].Similarity < tables[scan].Similarity)
+                        {
+                            //Swap the values
+                            temp = tables[index];
+                            tables[index] = tables[scan];
+                            tables[scan] = temp;
+                        }
+
+                // Set string of tables ordered by similarity
+                for (int t = 0; t < tables.Length - 1; ++t)
+                {
+                    results += tables[t].URL + ":     \t" + String.Format("{0:0.00}", tables[t].Similarity) + "\n";
+                }
+            }
+            catch (Exception e) { Console.WriteLine("Error in FillTable(): " + e); }
+            return results;
         }
 
         #endregion

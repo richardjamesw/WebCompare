@@ -12,7 +12,6 @@ namespace WebCompare.ViewModel
     public class WebCompareViewModel : INotifyPropertyChanged
     {
         #region Instance Variables
-        private WebCompareModel wcModel;
         private static object lockObj = new object();
         private static volatile WebCompareViewModel instance;
 
@@ -61,6 +60,8 @@ namespace WebCompare.ViewModel
             set
             {
                 userURL = value;
+                NotifyPropertyChanged("UserURL");
+
             }
         }
 
@@ -73,23 +74,47 @@ namespace WebCompare.ViewModel
             }
         }
 
-        private string data_dump = "Enter a URL and press start above. \n Or try https://stocktwits.com/symbol/GOOG.";
-        public string DataDump
+        private string results = "Results will appear here in descending order of similarity.";
+        public string Results
         {
             get
             {
-                return data_dump;
+                return results;
             }
 
             set
             {
-                if (data_dump != value)
+                if (results != value)
                 {
-                    data_dump = value;
-                    NotifyPropertyChanged("DataDump");
+                    results = value;
+                    NotifyPropertyChanged("Results");
                 }
 
             }
+        }
+
+        private string status = "Enter a URL and press start above. \n Or try https://stocktwits.com/symbol/GOOG.";
+        public string Status
+        {
+            get
+            {
+                return status;
+            }
+
+            set
+            {
+                if (status != value)
+                {
+                    status = value;
+                    NotifyPropertyChanged("Status");
+                }
+
+            }
+        }
+
+        public void AddMessage(string s)
+        {
+            
         }
 
         #endregion

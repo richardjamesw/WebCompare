@@ -8,10 +8,11 @@ namespace WebCompare.Model
 {
     public class HTable
     {
-        private HTable Instance;
         private HEntry[] table;
         private int tableSize = 16;
         private int count;
+        private double similarity;
+        private string url;
 
         // Entry class
         public class HEntry
@@ -43,7 +44,7 @@ namespace WebCompare.Model
         public void Put(string key, int value)
         {
             // Check if we should expand
-            if (count > (int)tableSize*.5)
+            if (count > (int)tableSize * .5)
             {
                 this.ExpandCapacity();
             }
@@ -53,7 +54,7 @@ namespace WebCompare.Model
             // Create new entry
             HEntry entry = new HEntry(key, value);
 
-            // Insert entry to hash array
+            // Insert entry to table array
             if (table[h] == null)
             {
                 // No collision, insert entry
@@ -92,7 +93,7 @@ namespace WebCompare.Model
             // If there is no such key
             if (temp[h] == null)
             {
-                return -1;
+                return 0;
             }
             else // Else
             {
@@ -103,7 +104,7 @@ namespace WebCompare.Model
                 }
                 if (entry == null)   // Key wasn't found
                 {
-                    return -1;
+                    return 0;
                 }
                 else   // Key was found
                 {
@@ -193,7 +194,65 @@ namespace WebCompare.Model
             }
         }
 
+        // Cosine Vector Similarity Score
+        public double Similarity
+        {
+            get
+            {
+                return similarity;
+            }
+            set
+            {
+                similarity = value;
+            }
+        }
+
+        // Assigned website url
+        public string URL
+        {
+            get
+            {
+                return url;
+            }
+            set
+            {
+                url = value;
+            }
+        }
+
         #endregion
+
+        // Get all key words into a string array
+        public List<string> ToList()
+        {
+            HEntry[] temp = table;
+            HEntry current;
+            List<string> newArr = new List<string>();
+
+            foreach (var t in temp)
+            { //iterate through array
+
+                if (t != null)
+                {
+                    try
+                    {
+                        newArr.Add(t.key);
+                        current = t;
+                        while (current.next != null)
+                        {
+                            current = current.next;
+                            newArr.Add(current.key);
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error in HEntry.ToArray: " + e);
+                    }
+                }
+            }
+            return newArr;
+        }
 
         public void ExpandCapacity()
         {

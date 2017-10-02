@@ -62,34 +62,34 @@ namespace WebCompare.Model
             return null;
         }
 
-/*        public static string GetWebData2(string url)
-        {
-            try
-            {
-                string line = "";
-                string parsed = "";
-                WebRequest webRequest;
-                webRequest = WebRequest.Create(url);
-
-                Stream objStream;
-                objStream = webRequest.GetResponse().GetResponseStream();
-
-                StreamReader objReader = new StreamReader(objStream);
-
-                while (objReader != null)
+        /*        public static string GetWebData2(string url)
                 {
-                    line = objReader.ReadLine();
-                    parsed += Parser(line) + "\n";
-                }
-                return parsed;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Exception caught: " + e, "Exception:Session:GetWebData()", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+                    try
+                    {
+                        string line = "";
+                        string parsed = "";
+                        WebRequest webRequest;
+                        webRequest = WebRequest.Create(url);
 
-            return null;
-        }*/
+                        Stream objStream;
+                        objStream = webRequest.GetResponse().GetResponseStream();
+
+                        StreamReader objReader = new StreamReader(objStream);
+
+                        while (objReader != null)
+                        {
+                            line = objReader.ReadLine();
+                            parsed += Parser(line) + "\n";
+                        }
+                        return parsed;
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Exception caught: " + e, "Exception:Session:GetWebData()", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+
+                    return null;
+                }*/
 
 
         /// <summary>
@@ -99,9 +99,7 @@ namespace WebCompare.Model
         public static string[] Parser(string[] data)
         {
             if (data == null) return null;
-
             string[] output = null;
-
             try
             {
                 string temp = "";
@@ -112,15 +110,22 @@ namespace WebCompare.Model
                 string regexStock2 = @"(?<=(body&quot;:&quot;))(\w|\d|\n|[().,\-:;@#$%^&*\[\]'+–/\/®°⁰!?{}|`~]| )+?(?=(&quot;,&quot;links))";
                 //string regexStock3 = "(?<=(<ol class='stream-list.*&quot;body&quot;:&quot;))(\\w|\\d|\n|^quot|[().,\\-:;@#$%^&*\\[\\]'+–/\\/®°⁰!?{}|`~]| )+?(?=(&quot;,&quot;links))";
 
-                foreach (var s in data)
+                // Start at slot 3, first 3 elements are meta data
+                for (int s = 3; s < data.Length; ++s)
                 {
-                    var tempParsed = Regex.Matches(s, regexStock2, RegexOptions.Singleline);
-                    foreach (var m in tempParsed)
+                    var tempParsed = Regex.Matches(data[s], regexStock2, RegexOptions.Singleline);
+                    foreach (var msg in tempParsed)
                     {
-                        temp += m.ToString() + ' ';
+                        // append each message as a string 
+                        temp += msg.ToString() + ' ';
                     }
                 }
 
+                // Remove random characters
+                temp = new string(temp
+                        .Where(x => char.IsWhiteSpace(x) || char.IsLetterOrDigit(x) || x == '$')
+                        .ToArray());
+                // Split into array
                 output = temp.Split(' ');
             }
             catch { }
@@ -128,35 +133,54 @@ namespace WebCompare.Model
             return output;
         }
 
+        // Similarity Calculation
+        // Build Vectors
+        public static List<object>[] BuildVector(HTable tableA, HTable tableB)
+        {
+            // Guard
+            if (tableA == null || tableB == null) return null;
+            // New vector
+            List<object>[] vector = new List<object>[3];
+            vector[1] = new List<object>();
+            vector[2] = new List<object>();
+            try
+            {
+                // Get word lists together, remove duplicates
+                var words = tableA.ToList().Union(tableB.ToList());
+                // Sort words
+                words = words.OrderBy(s => s, StringComparer.CurrentCultureIgnoreCase);
+                // Add key words to the vector
+                vector[0] = words.ToList<object>();
+                // Add the frequencies to the vector
+                foreach (string keyword in vector[0])
+                {
+                    vector[1].Add(tableA.GetValue(keyword));
+                    vector[2].Add(tableB.GetValue(keyword));
+                }
+            }
+            catch (Exception e) { Console.WriteLine("Error building vector: " + e); }
 
-        // Similarity
-        public static ArrayList BuildVector(HTable a, HTable b)
-      {
-         /*
-          * 5x Pos/Neg
-          * 3x bull, bullish, bear, bearish
-          * 3x Price
-          * 3x exchange
-          * 2x .Contains('$')
-          * 
-          */
-         return null;
+            return vector;
 
-      }
+        }
 
-      public static double CosineSimilarity(double[] tableA, double[] tableB)
-      {
-         double dotProduct = 0.0, normA = 0.0, normB = 0.0;
+        // Cosine Similarity
+        public static double CosineSimilarity(List<object>[] vector)
+        {
+            // convert lists to double arrays
+            double[] tableA = vector[1].Select(item => Convert.ToDouble(item)).ToArray();
+            double[] tableB = vector[2].Select(item => Convert.ToDouble(item)).ToArray();
+            double dotProduct = 0.0, normA = 0.0, normB = 0.0;
+            // calculate
+            for (int i = 0; i < tableA.Length; i++)
+            {
+                dotProduct += tableA[i] * tableB[i];
+                normA += Math.Pow(tableA[i], 2);
+                normB += Math.Pow(tableB[i], 2);
+            }
+            return dotProduct / (Math.Sqrt(normA) * Math.Sqrt(normB));
 
-         for (int i = 0; i < tableA.Length; i++)
-         {
-            dotProduct += tableA[i] * tableB[i];
-            normA += Math.Pow(tableA[i], 2);
-            normB += Math.Pow(tableB[i], 2);
-         }
-         return dotProduct / (Math.Sqrt(normA) * Math.Sqrt(normB));
-
-      }
+        }
         #endregion
 
 
