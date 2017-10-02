@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;    //for iNotifyPropertyChanged
 using System.Windows.Input; // ICommand
 using WebCompare.Model;
+using Prism.Commands;
 
 namespace WebCompare.ViewModel
 {
@@ -33,6 +34,7 @@ namespace WebCompare.ViewModel
 
         public WebCompareViewModel()
         {
+           StartCommand = new DelegateCommand(OnStart, CanStart);
         }
         #endregion
 
@@ -120,15 +122,24 @@ namespace WebCompare.ViewModel
         #endregion
 
         #region Commands
-        //Commands.DelegateCommand dc = new Commands.DelegateCommand(Session.Instance.Start());
+        // Old method
         // Button to call start method
-        public ICommand BtnGo
-        {
-            get
-            {
-                return new Commands.DelegateCommand(o => Session.Instance.Start());
-            }
-        }
+        //public ICommand BtnGo
+        //{
+        //    get
+        //    {
+        //        return new Commands.DelegateCommand(o => Session.Instance.Start());
+        //    }
+        //}
+        public DelegateCommand StartCommand { get; private set; }
+        private void OnStart()
+      {
+         Session.Instance.Start();
+      }
+      private bool CanStart()
+      {
+         return !Session.Instance.worker.IsBusy;
+      }
         #endregion
 
     }

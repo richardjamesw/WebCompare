@@ -22,12 +22,13 @@ namespace WebCompare
    {
       public MainWindow()
       {
+         
          InitializeComponent();
       }
 
-        private void btnGo_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-    }
+      private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+      {
+         this.tbStatus.ScrollToEnd();
+      }
+   }
 }

@@ -12,14 +12,16 @@ using System.Text.RegularExpressions;
 using System.IO;
 using HtmlAgilityPack;
 using System.Windows.Threading;
+using Prism.Commands;
 
 namespace WebCompare.ViewModel
 {
     public class Session : INotifyPropertyChanged
     {
         #region Instance Variables & Constructor
-
+        public readonly BackgroundWorker worker = new BackgroundWorker();
         private WebCompareViewModel wcViewModel = WebCompareViewModel.Instance;
+
         HTable[] tables = new HTable[WebCompareModel.Websites.Length + 1];
         private static object lockObj = new object();
         private static volatile Session instance;
@@ -41,6 +43,8 @@ namespace WebCompare.ViewModel
 
         public Session()
         {
+           worker.DoWork += worker_DoWork;
+           worker.RunWorkerCompleted += worker_RunWorkerCompleted;
         }
         #endregion
 
@@ -58,81 +62,92 @@ namespace WebCompare.ViewModel
         /// Start method
         /// </summary>
         /// <returns></returns>
-        public Action<object> Start()
+        public void Start()
         {
-            // Setup table for user entered url
-            for (int t = 0; t < tables.Length; ++t)
+           worker.RunWorkerAsync();
+        }
+
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+
+         // Setup table for user entered url
+         for (int t = 0; t < tables.Length; ++t)
+         {
+            tables[t] = new HTable();
+            if (t < WebCompareModel.Websites.Length)
+               tables[t].URL = WebCompareModel.Websites[t];
+            else
+               tables[t].URL = wcViewModel.UserURL;
+         }
+
+         // if nothings entered in url return
+         if (wcViewModel.UserURL == "")
+         {
+            AddMessage("\nPlease enter a valid URL");
+            return;
+         }
+
+         //string[] test = GetWebDataAgility(wcViewModel.UserURL);
+         AddMessage("");
+         string[] data = null;
+         string[] parsedMessages = null;
+
+         // Get Data from Websites
+         for (int w = 0; w <= WebCompareModel.Websites.Length; ++w)
+         {
+            if (w != WebCompareModel.Websites.Length)
             {
-                tables[t] = new HTable();
-                if (t < WebCompareModel.Websites.Length)
-                    tables[t].URL = WebCompareModel.Websites[t];
-                else
-                    tables[t].URL = wcViewModel.UserURL;
+               // Get data
+               AddMessage("\nGETTING data from: " + WebCompareModel.Websites[w]);
+               data = GetWebDataAgility(WebCompareModel.Websites[w]);
+
+               // Parse each message into
+               AddMessage("\nPARSING data from: " + WebCompareModel.Websites[w]);
+               parsedMessages = WebCompareModel.Parser(data);
+
+               // Fill respective table
+               AddMessage("\nFILLING TABLE from: " + WebCompareModel.Websites[w] + "\n");
+               FillTables(data, parsedMessages, w);
+
+            }
+            else   // We are at the last table, aka the User entered table
+            {
+               // Get data
+               AddMessage("\nGETTING data from USER entered webpage");
+               data = GetWebDataAgility(wcViewModel.UserURL);
+
+               // Parse each message into
+               AddMessage("\nPARSING data from USER entered webpage");
+               parsedMessages = WebCompareModel.Parser(data);
+
+               // Fill respective
+               AddMessage("\nFILLING TABLE from USER entered webpage\n");
+               FillTables(data, parsedMessages, w);
             }
 
-            // if nothings entered in url return
-            if (wcViewModel.UserURL == "")
-            {
-                AddMessage("\nPlease enter a valid URL");
-                return null;
-            }
+         }    // End get data from websites
 
-            //string[] test = GetWebDataAgility(wcViewModel.UserURL);
-            AddMessage("");
-            string[] data = null;
-            string[] parsedMessages = null;
+         // Calculate cosine vectors
+         AddMessage("\nCALCULATING cosine vectors\n");
 
-            // Get Data from Websites
-            for (int w = 0; w <= WebCompareModel.Websites.Length; ++w)
-            {
-                if (w != WebCompareModel.Websites.Length)
-                {
-                    // Get data
-                    AddMessage("\nGETTING data from: " + WebCompareModel.Websites[w]);
-                    data = GetWebDataAgility(WebCompareModel.Websites[w]);
+         for (int tab = 0; tab < tables.Length - 1; ++tab)
+         {
+            // get vector, last table is the user entered table
+            List<object>[] vector = WebCompareModel.BuildVector(tables[tab], tables[tables.Length - 1]);
+            // Calcualte similarity
+            tables[tab].Similarity = WebCompareModel.CosineSimilarity(vector);
+         }
 
-                    // Parse each message into
-                    AddMessage("\nPARSING data from: " + WebCompareModel.Websites[w]);
-                    parsedMessages = WebCompareModel.Parser(data);
+         // Compare to the entered URL by the user
+         //     and display results in order
+         wcViewModel.Results = GetResults();
+      }
 
-                    // Fill respective table
-                    AddMessage("\nFILLING TABLE from: " + WebCompareModel.Websites[w] + "\n");
-                    FillTables(data, parsedMessages, w);
-
-                }
-                else   // We are at the last table, aka the User entered table
-                {
-                    // Get data
-                    AddMessage("\nGETTING data from USER entered webpage");
-                    data = GetWebDataAgility(wcViewModel.UserURL);
-
-                    // Parse each message into
-                    AddMessage("\nPARSING data from USER entered webpage");
-                    parsedMessages = WebCompareModel.Parser(data);
-
-                    // Fill respective
-                    AddMessage("\nFILLING TABLE from USER entered webpage\n");
-                    FillTables(data, parsedMessages, w);
-                }
-
-            }    // End get data from websites
-
-            // Calculate cosine vectors
-            AddMessage("\nCALCULATING cosine vectors\n");
-
-            for (int tab = 0; tab < tables.Length - 1; ++tab)
-            {
-                // get vector, last table is the user entered table
-                List<object>[] vector = WebCompareModel.BuildVector(tables[tab], tables[tables.Length - 1]);
-                // Calcualte similarity
-                tables[tab].Similarity = WebCompareModel.CosineSimilarity(vector);
-            }
-
-            // Compare to the entered URL by the user
-            //     and display results in order
-            wcViewModel.Results = GetResults();
-
-            return null;
+      private void worker_RunWorkerCompleted(object sender,
+                                               RunWorkerCompletedEventArgs e)
+        {
+         //update ui once worker complete his work
+         wcViewModel.StartCommand.RaiseCanExecuteChanged();
 
         }
 
